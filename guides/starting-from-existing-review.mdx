@@ -1,7 +1,7 @@
 ---
-title: "Start PA-PVP Mini from an Existing Review"
+title: "PA-PVP Mini: Start a Review from an Existing Analysis"
 sidebarTitle: "Existing Review"
-description: "Use PA-PVP Mini to audit an existing review, findings list, or tool output — not just to start a fresh review from scratch."
+description: "Use PA-PVP Mini to audit an existing review, findings list, or tool output — skip a fresh start and work from what you already have."
 ---
 
 You do not need a prior PA-PVP Mini round to use PA-PVP Mini in Round 2+ mode. If you already have a structured review, a findings list from a colleague, linter output, a security audit, or any other prior analysis, you can feed it directly into the protocol as `PREVIOUS_ROUND_OUTPUT`. PA-PVP Mini will treat it as audit material — checking it against the original artifact rather than simply accepting its conclusions.
@@ -11,16 +11,16 @@ You do not need a prior PA-PVP Mini round to use PA-PVP Mini in Round 2+ mode. I
 `PREVIOUS_ROUND_OUTPUT` accepts any structured prior analysis, including:
 
 <CardGroup cols={2}>
-  <Card title="Previous PA-PVP rounds" icon="rotate">
+  <Card title="Previous PA-PVP rounds" icon="rotate" href="/guides/single-ai-mode">
     Output from an earlier PA-PVP Mini session, whether run by you or another person.
   </Card>
-  <Card title="Findings lists from colleagues" icon="users">
+  <Card title="Findings lists from colleagues" icon="users" href="/reference/input-blocks">
     Peer review notes, code review comments, or structured feedback from a team member.
   </Card>
-  <Card title="Tool output" icon="wrench">
+  <Card title="Tool output" icon="wrench" href="/reference/input-blocks">
     Linter results, static analysis output, security audit findings, or any structured diagnostic output.
   </Card>
-  <Card title="Notes and informal reviews" icon="note-sticky">
+  <Card title="Notes and informal reviews" icon="note-sticky" href="/reference/input-blocks">
     Structured notes, decision memos with objections listed, or findings from a prior meeting.
   </Card>
 </CardGroup>

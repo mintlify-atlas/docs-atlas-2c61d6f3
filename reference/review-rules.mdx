@@ -1,5 +1,5 @@
 ---
-title: "PA-PVP Mini Review Rules and Finding Criteria"
+title: "PA-PVP Mini Review Rules: Finding Validity Reference"
 sidebarTitle: "Review Rules"
 description: "The complete set of rules governing what counts as a valid finding, how many findings are allowed, and what the section concentration rule means."
 ---
@@ -8,7 +8,7 @@ The protocol enforces strict rules on what counts as a valid finding and what ca
 
 ## Finding Validity Criteria
 
-Every finding must satisfy all five of the following criteria. Failing any one disqualifies the finding.
+Every finding must satisfy all four of the following criteria. Failing any one disqualifies the finding.
 
 **Observable** — The problem must be directly visible in `ORIGINAL_ARTIFACT`. If it requires inference, assumption, or reading between the lines, it does not qualify. The reviewer must be able to point to the specific content that exhibits the problem.
 
@@ -18,7 +18,9 @@ Every finding must satisfy all five of the following criteria. Failing any one d
 
 **Structurally relevant** — The problem must affect structure, behavior, constraints, decision rules, flow, validation, or operational clarity. Surface issues that do not touch any of these dimensions are excluded.
 
-**Anchored to ORIGINAL_ARTIFACT** — Every finding and every evidence line must cite content from `ORIGINAL_ARTIFACT` specifically. Evidence drawn from `PREVIOUS_ROUND_OUTPUT`, `MEMORY_NOTE`, chat context, or reviewer assumptions is invalid.
+## Evidence Anchoring
+
+Every finding and every evidence line must cite content from `ORIGINAL_ARTIFACT` specifically. Evidence drawn from `PREVIOUS_ROUND_OUTPUT`, `MEMORY_NOTE`, chat context, or reviewer assumptions is invalid. This requirement applies independently of the four validity criteria above — a finding that meets all four criteria but cites evidence from outside `ORIGINAL_ARTIFACT` is still dropped.
 
 ## Fix Validity
 
@@ -52,7 +54,7 @@ The reviewer produces no praise, encouragement, narrative commentary, or positiv
 ## FAQs
 
 <Accordion title="What if I disagree with a finding?">
-  Supply the updated artifact as a new `ORIGINAL_ARTIFACT` in the next round alongside the prior output in `PREVIOUS_ROUND_OUTPUT`. The reviewer will re-examine the artifact independently, then check whether the prior finding still holds. If the problem was addressed, the finding will be marked `CONFIRMED` as fixed or will simply not reappear. If the reviewer still observes the problem, it will reappear with a `CONFIRMED` label and updated evidence. You can also use `CURRENT_ROUND` to force a fresh Round 1 on the revised content.
+  Supply the updated artifact as a new `ORIGINAL_ARTIFACT` in the next round alongside the prior output in `PREVIOUS_ROUND_OUTPUT`. The reviewer will re-examine the artifact independently, then check whether the prior finding still holds. If the problem was addressed, the finding will simply not reappear — or the prior fix will appear in `confirmed_fixes_ready` in the MERGE STATUS block as resolved. If the reviewer still observes the problem, it will reappear with a `CONFIRMED` label and updated evidence, meaning the independent review reached the same conclusion. You can also use `CURRENT_ROUND` to force a fresh Round 1 on the revised content.
 </Accordion>
 
 <Accordion title="Can the reviewer produce zero findings?">

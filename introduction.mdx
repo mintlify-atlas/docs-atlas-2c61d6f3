@@ -22,7 +22,7 @@ PA-PVP Mini organizes review into numbered rounds.
 
 **Round 1** produces one independent full review using only your submitted artifact as the source of truth. All findings are labeled `INDEPENDENT`, meaning they were reached without reference to any prior review.
 
-**Round 2+** runs in strict order: first, the AI completes an independent review of the original artifact; then, it audits the prior round's output, confirming, challenging, or superseding earlier findings. This two-step sequence prevents the prior review from polluting the current independent pass.
+**Round 2+** runs in strict order: first, the AI completes an independent review of the original artifact; then, it audits the prior round's output — confirming valid findings, challenging invalid or weak ones, and flagging new misses the prior round did not catch. This two-step sequence prevents the prior review from polluting the current independent pass.
 
 **Ping-pong mode** extends this across two separate AI chats. You activate PA-PVP Mini in AI-A, get Round 1, then activate it in AI-B and give it both the original artifact and AI-A's output. AI-B reviews the material independently and then challenges the previous review — two different models, zero shared memory, maximum adversarial pressure.
 

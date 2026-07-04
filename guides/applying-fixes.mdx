@@ -1,7 +1,7 @@
 ---
-title: "How to Apply Fixes from PA-PVP Mini Reviews"
+title: "Applying Fixes from PA-PVP Mini Adversarial Reviews"
 sidebarTitle: "Applying Fixes"
-description: "Understand which PA-PVP Mini findings deserve action, how to prioritize fixes across rounds, and when to skip a finding."
+description: "Understand which PA-PVP Mini findings deserve action, how to prioritize confirmed findings across rounds, and when to skip or defer."
 ---
 
 PA-PVP Mini produces a list of findings with fixes — but not every finding is equally ready to act on. Applying fixes automatically without judgment defeats the purpose of the review. The right approach is to use the protocol's own output signals — labels, severity, and `MERGE STATUS` — as a triage guide before touching anything.
@@ -15,16 +15,16 @@ Do not apply every finding automatically. A finding is worth acting on when it h
 A finding has earned action when it meets most of the following criteria:
 
 <CardGroup cols={2}>
-  <Card title="Clear evidence" icon="magnifying-glass">
+  <Card title="Clear evidence" icon="magnifying-glass" href="/reference/review-rules">
     The finding's `evidence` line is anchored directly to the `ORIGINAL_ARTIFACT` — not to the prior review, not to a general pattern, and not to something outside the artifact.
   </Card>
-  <Card title="Confirmed across rounds" icon="circle-check">
+  <Card title="Confirmed across rounds" icon="circle-check" href="/reference/output-format">
     The finding carries a `CONFIRMED` label, meaning a second independent AI reviewed the artifact and reached the same conclusion without being influenced by the prior finding.
   </Card>
-  <Card title="Structural relevance" icon="sitemap">
+  <Card title="Structural relevance" icon="sitemap" href="/reference/review-rules">
     The fix changes at least one of: structure, behavior, constraints, decision rules, flow, validation, or operational clarity. A fix that changes only surface wording without affecting meaning is not structural.
   </Card>
-  <Card title="Not challenged" icon="shield-halved">
+  <Card title="Not challenged" icon="shield-halved" href="/reference/output-format">
     The finding has not been labeled `CHALLENGED` by a subsequent round. A challenge means a second AI found the finding invalid, overstated, duplicated, or not anchored to the artifact.
   </Card>
 </CardGroup>
@@ -48,16 +48,16 @@ A finding has earned action when it meets most of the following criteria:
 Round 2+ outputs include a `MERGE STATUS` block. Use it as a prioritized action list before reading individual findings:
 
 <CardGroup cols={2}>
-  <Card title="confirmed_fixes_ready → High priority" icon="circle-check">
+  <Card title="confirmed_fixes_ready → High priority" icon="circle-check" href="/reference/output-format">
     These fixes survived an independent re-review of the artifact. They have been validated by two separate passes and are the strongest candidates for immediate action.
   </Card>
-  <Card title="challenged_items → Investigate before acting" icon="magnifying-glass">
+  <Card title="challenged_items → Investigate before acting" icon="magnifying-glass" href="/reference/output-format">
     A prior finding or fix was disputed. Read both positions, check the artifact yourself, and decide whether the original finding, the challenge, or neither is correct.
   </Card>
-  <Card title="new_fixes → One more round of validation" icon="circle-plus">
+  <Card title="new_fixes → One more round of validation" icon="circle-plus" href="/reference/output-format">
     Fresh findings from the current round that were not in any prior round. They are unconfirmed. Run another round or review them manually before applying.
   </Card>
-  <Card title="conflicts → Human judgment required" icon="triangle-exclamation">
+  <Card title="conflicts → Human judgment required" icon="triangle-exclamation" href="/reference/output-format">
     Direct contradictions between the current independent review and the prior audit position. These are declared explicitly and cannot be resolved by the protocol — they require you to read both positions and make a call.
   </Card>
 </CardGroup>

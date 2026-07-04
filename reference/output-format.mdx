@@ -1,7 +1,7 @@
 ---
-title: "PA-PVP Mini Output Format Reference"
+title: "PA-PVP Mini Output Format: Findings and Merge Status"
 sidebarTitle: "Output Format"
-description: "Complete reference for the PA-PVP Mini output structure: ROUND header, FINDINGS block fields, MERGE STATUS block, provenance fields, and END OF PROTOCOL marker."
+description: "Complete reference for the PA-PVP Mini output structure: ROUND header, FINDINGS block, MERGE STATUS block, provenance fields, and END OF PROTOCOL marker."
 ---
 
 Every PA-PVP Mini response follows a fixed, fully structured format. The output is designed to be machine-parseable and unambiguous — field positions are consistent, labels are from a closed vocabulary, and the `END OF PROTOCOL` marker signals clean termination. No prose, narrative, or commentary appears outside the defined fields.
@@ -40,7 +40,7 @@ Each finding occupies one block. Fields appear in the order shown below. All fie
 </ResponseField>
 
 <ResponseField name="label" type="string" required>
-  `INDEPENDENT` in Round 1 for all findings. In Round 2+: `INDEPENDENT` (produced without consulting prior output), `CONFIRMED` (prior finding revalidated), `CHALLENGED` (prior finding rejected or overstated), or `NEW` (not present in prior output).
+  `INDEPENDENT` in Round 1 for all findings. In Round 2+: `INDEPENDENT` (produced without consulting prior output), `CONFIRMED` (prior finding revalidated), `CHALLENGED` (prior finding rejected, overstated, duplicated, or weak), or `NEW` (not present in prior output).
 </ResponseField>
 
 <ResponseField name="what_breaks" type="string" required>

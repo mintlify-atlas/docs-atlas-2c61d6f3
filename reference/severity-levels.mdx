@@ -1,18 +1,18 @@
 ---
-title: "Severity Levels in PA-PVP Mini Findings"
+title: "PA-PVP Mini Severity: HIGH, MEDIUM, and LOW Defined"
 sidebarTitle: "Severity Levels"
-description: "How PA-PVP Mini assigns HIGH, MED, and LOW severity to findings — definitions, tiebreaker rules, and how severity guides fix prioritization."
+description: "How PA-PVP Mini assigns HIGH, MEDIUM, and LOW severity to findings — definitions, tiebreaker rules, and how severity guides fix prioritization."
 ---
 
-Severity has exactly three levels. Each level has a specific definition from the protocol — there is no room for subjective escalation. When severity is ambiguous, a tiebreaker rule forces the lower value and requires an explanation, which prevents inflation and keeps severity meaningful across rounds.
+Severity has exactly three levels. Each level has a specific definition from the protocol — there is no room for subjective escalation. When severity is ambiguous, a tiebreaker rule forces the lower value and requires an explanation, which prevents inflation and keeps severity meaningful across rounds. In finding output lines the middle level is abbreviated as `MED`; in the definitions below it appears as `MEDIUM`, matching the protocol's SEVERITY section.
 
 ## Severity Levels
 
-| Severity | Definition | Typical examples |
-|---|---|---|
-| `HIGH` | Breaks core function, correctness, execution viability, or downstream trust | Missing termination condition, undefined behavior on valid input, output that corrupts downstream consumers, logic that silently produces wrong results |
-| `MED` | Weakens reliability, robustness, auditability, or prioritization without causing core collapse | Retry logic with no cap, missing audit trail for state changes, ambiguous priority ordering between two rules, no error surface for recoverable failures |
-| `LOW` | Real structural weakness with limited blast radius | Inconsistent naming convention that could cause confusion in one edge case, a constraint that is technically present but not enforced in one minor branch |
+| Level name | Output tag | Definition | Typical examples |
+|---|---|---|---|
+| `HIGH` | `HIGH` | Breaks core function, correctness, execution viability, or downstream trust | Missing termination condition, undefined behavior on valid input, output that corrupts downstream consumers, logic that silently produces wrong results |
+| `MEDIUM` | `MED` | Weakens reliability, robustness, auditability, or prioritization without causing core collapse | Retry logic with no cap, missing audit trail for state changes, ambiguous priority ordering between two rules, no error surface for recoverable failures |
+| `LOW` | `LOW` | Real structural weakness with limited blast radius | Inconsistent naming convention that could cause confusion in one edge case, a constraint that is technically present but not enforced in one minor branch |
 
 ## Tiebreaker Rule
 

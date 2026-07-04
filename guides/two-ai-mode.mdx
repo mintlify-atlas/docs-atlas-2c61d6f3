@@ -1,5 +1,5 @@
 ---
-title: "Two-AI Ping-Pong Review with PA-PVP Mini"
+title: "Two-AI Ping-Pong Adversarial Review with PA-PVP Mini"
 sidebarTitle: "Two-AI Mode"
 description: "Run alternating adversarial review passes across two independent AI chats — each one challenges both the artifact and the previous review."
 ---
@@ -69,16 +69,16 @@ Each round is fully self-contained. The full text of `PREVIOUS_ROUND_OUTPUT` car
 Round 2+ outputs include a `MERGE STATUS` block at the end of the findings. The fields are:
 
 <CardGroup cols={2}>
-  <Card title="confirmed_fixes_ready ✅" icon="circle-check">
+  <Card title="confirmed_fixes_ready ✅" icon="circle-check" href="/reference/output-format">
     Fixes from the prior round that survived the current independent review. These have been validated by two separate passes.
   </Card>
-  <Card title="challenged_items 🥊" icon="circle-xmark">
+  <Card title="challenged_items 🥊" icon="circle-xmark" href="/reference/output-format">
     Prior findings or fixes that the current AI disputes — because they are invalid, overstated, duplicated, weak, or not anchored to the artifact.
   </Card>
-  <Card title="new_fixes 🆕" icon="circle-plus">
+  <Card title="new_fixes 🆕" icon="circle-plus" href="/reference/output-format">
     Fixes for problems found in the current round that were not present in any prior round. These are fresh and have not yet been cross-checked.
   </Card>
-  <Card title="conflicts ⚠️" icon="triangle-exclamation">
+  <Card title="conflicts ⚠️" icon="triangle-exclamation" href="/reference/output-format">
     Direct contradictions between the current independent review and the prior audit position. Conflicts are declared explicitly rather than silently resolved — they require human judgment.
   </Card>
 </CardGroup>
