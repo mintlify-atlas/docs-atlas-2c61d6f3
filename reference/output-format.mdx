@@ -1,0 +1,135 @@
+---
+title: "PA-PVP Mini Output Format Reference"
+sidebarTitle: "Output Format"
+description: "Complete reference for the PA-PVP Mini output structure: ROUND header, FINDINGS block fields, MERGE STATUS block, provenance fields, and END OF PROTOCOL marker."
+---
+
+Every PA-PVP Mini response follows a fixed, fully structured format. The output is designed to be machine-parseable and unambiguous — field positions are consistent, labels are from a closed vocabulary, and the `END OF PROTOCOL` marker signals clean termination. No prose, narrative, or commentary appears outside the defined fields.
+
+## ROUND Header
+
+The output opens with a ROUND block that identifies the current review round and the mode of execution.
+
+| Field | Type | Values |
+|---|---|---|
+| `current_round` | number | The round number in effect for this output |
+| `round_mode` | string | `ROUND 1` or `ROUND 2+` |
+
+## FINDINGS Block
+
+Each finding occupies one block. Fields appear in the order shown below. All fields are required for every finding.
+
+<ResponseField name="finding_id" type="string" required>
+  A single lowercase keyword taken from the core problem — for example `padding`, `merge-conflict`, or `sev-boundary`. No numbers, no category prefixes. Once assigned, this ID must be reused exactly across rounds whenever the same problem recurs. Do not assign a new ID to a problem already tracked in `PREVIOUS_ROUND_OUTPUT`.
+</ResponseField>
+
+<ResponseField name="fix_id" type="string" required>
+  Same naming convention as `finding_id`. Identifies the fix associated with this finding. Used in the MERGE STATUS block to track fix disposition across rounds.
+</ResponseField>
+
+<ResponseField name="origin_round" type="number" required>
+  The round number in which this finding first appeared.
+</ResponseField>
+
+<ResponseField name="derived_from" type="string" required>
+  The `finding_id` of a prior finding that this finding replaces or evolves from. Use `NONE` if this finding is not derived from any prior finding.
+</ResponseField>
+
+<ResponseField name="severity" type="string" required>
+  `HIGH`, `MED`, or `LOW`. See [Severity Levels](/reference/severity-levels) for definitions.
+</ResponseField>
+
+<ResponseField name="label" type="string" required>
+  `INDEPENDENT` in Round 1 for all findings. In Round 2+: `INDEPENDENT` (produced without consulting prior output), `CONFIRMED` (prior finding revalidated), `CHALLENGED` (prior finding rejected or overstated), or `NEW` (not present in prior output).
+</ResponseField>
+
+<ResponseField name="what_breaks" type="string" required>
+  One concise statement describing what structural element fails or is absent.
+</ResponseField>
+
+<ResponseField name="evidence" type="string" required>
+  The observable reason anchored to `ORIGINAL_ARTIFACT`. Must cite specific content from that block.
+</ResponseField>
+
+<ResponseField name="fix" type="string" required>
+  The structural fix. Must change at least one of: structure, behavior, constraints, decision rules, flow, validation, or operational clarity. Pure wording fixes are excluded unless they resolve structural ambiguity.
+</ResponseField>
+
+## MERGE STATUS Block
+
+The MERGE STATUS block appears **only in Round 2+ output**. It summarizes the disposition of all findings and fixes relative to prior rounds. It has four fields.
+
+<ResponseField name="confirmed_fixes_ready" type="list">
+  Each entry: `[fix_id]` + a one-line reason the fix is confirmed as valid and ready to apply.
+</ResponseField>
+
+<ResponseField name="challenged_items" type="list">
+  Each entry: `[finding_id or fix_id]` + why it is challenged + replacement finding or fix if one exists. Challenged items are those the independent review found to be invalid, overstated, duplicated, or structurally weak.
+</ResponseField>
+
+<ResponseField name="new_fixes" type="list">
+  Each entry: `[fix_id]` + a one-line reason this fix is new (no prior counterpart).
+</ResponseField>
+
+<ResponseField name="conflicts" type="list">
+  Each entry: `[finding_id]` + the independent review's position + the prior audit's position. A conflict exists when the two rounds reach opposite conclusions about the same problem.
+</ResponseField>
+
+## END OF PROTOCOL Marker
+
+The literal string `END OF PROTOCOL` closes every output. It signals that the structured output is complete and no additional content follows.
+
+## Example Outputs
+
+**Round 1 example:**
+
+```text
+ROUND:
+- current_round: 1
+- round_mode: ROUND 1
+
+FINDINGS:
+- [null-check] [null-check-fix] [1] [NONE] [HIGH] [INDEPENDENT]
+- what_breaks: The validation step has no defined behavior when input is null.
+- evidence: ORIGINAL_ARTIFACT section "Input Handling" specifies required fields but contains no null branch.
+- fix: Add an explicit null check before the validation block that returns a typed error and halts execution.
+
+- [retry-cap] [retry-cap-fix] [1] [NONE] [MED] [INDEPENDENT]
+- what_breaks: The retry loop has no maximum iteration count, allowing unbounded execution.
+- evidence: ORIGINAL_ARTIFACT section "Retry Logic" defines a delay interval but no termination condition.
+- fix: Add a configurable MAX_RETRIES constant and a loop exit condition that raises a failure state when exceeded.
+
+END OF PROTOCOL
+```
+
+**Round 2 example:**
+
+```text
+ROUND:
+- current_round: 2
+- round_mode: ROUND 2+
+
+FINDINGS:
+- [null-check] [null-check-fix] [1] [NONE] [HIGH] [CONFIRMED]
+- what_breaks: The validation step has no defined behavior when input is null.
+- evidence: ORIGINAL_ARTIFACT section "Input Handling" still contains no null branch after revision.
+- fix: Add an explicit null check before the validation block that returns a typed error and halts execution.
+
+- [retry-cap] [retry-cap-fix] [1] [NONE] [MED] [CHALLENGED]
+- what_breaks: Prior finding claimed unbounded retry loop; revised artifact now includes MAX_RETRIES.
+- evidence: ORIGINAL_ARTIFACT section "Retry Logic" now defines MAX_RETRIES = 5 with an exit condition.
+- fix: No fix required — prior finding is resolved.
+
+- [fallback-state] [fallback-state-fix] [2] [NONE] [MED] [NEW]
+- what_breaks: Failure state after MAX_RETRIES is reached has no defined fallback behavior.
+- evidence: ORIGINAL_ARTIFACT section "Retry Logic" exits the loop on MAX_RETRIES but specifies no subsequent action.
+- fix: Define a fallback path — either a dead-letter queue entry, a caller-facing error response, or an explicit halt — that executes after the retry cap is reached.
+
+MERGE STATUS:
+- confirmed_fixes_ready: [null-check-fix] Still unresolved in revised artifact; fix remains valid and applicable.
+- challenged_items: [retry-cap-fix] Resolved in revised artifact; prior finding no longer applies. No replacement.
+- new_fixes: [fallback-state-fix] New gap exposed by the retry cap addition in the revised artifact.
+- conflicts: NONE
+
+END OF PROTOCOL
+```

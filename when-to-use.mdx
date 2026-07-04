@@ -1,0 +1,79 @@
+---
+title: "When to Use PA-PVP Mini for Adversarial Review"
+sidebarTitle: "When to Use"
+description: "Discover which artifacts and situations benefit most from PA-PVP Mini's structured adversarial review, and when other approaches are better."
+---
+
+PA-PVP Mini is built for one purpose: finding what breaks before you act on it. It works best when you have something that looks plausible — an idea, a plan, an AI-generated answer, a procedure — but you do not yet want to trust it. The protocol is deliberately narrow: it does not validate effort, improve style, or generate alternatives. What it does is surface structural gaps, weak logic, missing constraints, fragile assumptions, and shaky fixes with enough precision that you can decide whether to apply, challenge, or discard each one.
+
+## Best-fit situations
+
+Use PA-PVP Mini when you find yourself in one of these positions:
+
+- **You have an idea that sounds good but may have gaps.** The protocol will test the internal logic and surface unstated assumptions before you invest more time in it.
+- **An AI gave you an answer and you do not fully trust it.** Paste the answer as your `ORIGINAL_ARTIFACT` and the protocol will pressure-test it against its own claims and reasoning.
+- **You have proposed fixes and want to know which ones hold up.** PA-PVP Mini checks whether each fix actually addresses the structural problem it claims to solve.
+- **You wrote a plan, prompt, procedure, proposal, or spec and want a stricter review.** The protocol reviews the whole artifact, not just the most obvious issue or a single section.
+- **You want a second AI to challenge the first review.** Ping-pong mode runs two independent models against each other — the second AI audits the first AI's findings rather than simply agreeing with them.
+
+## Artifact types that work well
+
+PA-PVP Mini can review a wide range of structured artifacts:
+
+| Artifact type | Examples |
+|---|---|
+| Instructions | Step-by-step guides, runbooks, onboarding procedures |
+| Plans and proposals | Project plans, feature proposals, rollout strategies |
+| Decision memos | Go/no-go analyses, option comparisons, risk summaries |
+| Processes and checklists | Pre-launch checklists, incident response procedures |
+| Policies and rule sets | Operational policies, access control rules, usage guidelines |
+| Prompts and AI workflows | System prompts, agent instructions, multi-step AI pipelines |
+| Structured arguments | Position papers, reasoning chains, debate outlines |
+| Research outlines | Literature review plans, research question hierarchies |
+| Technical specs | API contracts, architecture documents, data schemas |
+| Bug, fix, and refactor lists | Defect lists, proposed code changes, refactoring plans |
+| AI-generated answers | Any model output that sounds plausible but needs pressure-testing |
+
+## Why structured artifacts work best
+
+The protocol depends on being able to anchor every finding to observable evidence in the submitted material. That means it performs best when the artifact contains things a reviewer can test against each other: steps that must occur in order, claims that depend on earlier claims, constraints that must hold across cases, decision rules with defined conditions, expected behaviors with implied inputs, or internal logic where one part must be consistent with another.
+
+If your artifact has those properties — even partially — PA-PVP Mini has something concrete to work with. A three-step procedure, a bulleted policy, a short prompt, or a rough research outline can all produce valid findings. The key is that the material has structure the protocol can probe.
+
+## When not to use it
+
+PA-PVP Mini is the wrong tool in several situations:
+
+- **Unstructured prose with no claims or logic.** A reflective journal entry, a creative narrative, or a stream-of-consciousness draft has no internal structure to anchor findings to. The protocol will either produce very weak output or nothing useful at all.
+- **When you want style or readability feedback.** PA-PVP Mini explicitly excludes style polish. Its reviewer is contractually prohibited from giving it. Use a different review mode for tone, clarity, or writing quality.
+- **When you need a guarantee of correctness.** PA-PVP Mini does not prove that something is correct. It does not find every problem. Its output depends on the AI model reading the protocol and applying it faithfully. Treat it as a structured review aid, not as authoritative verification.
+- **When you want encouragement or validation.** The protocol produces no praise and no narrative commentary. If you need a sounding board that affirms your direction before you refine it, this is not the right tool for that moment.
+
+## Common questions
+
+<Accordion title="Can I use it on code?">
+  Yes. A list of bugs, proposed fixes, or refactoring changes is explicitly one of the supported artifact types. You can also submit a code snippet, a function, or a short module as the `ORIGINAL_ARTIFACT`. The protocol will look for structural problems — logic gaps, missing constraints, fragile assumptions, edge cases not handled — rather than style issues like formatting or naming conventions. For best results, include enough surrounding context (inputs, expected behavior, dependencies) that the reviewer can anchor its findings concretely.
+</Accordion>
+
+<Accordion title="Does it work with any AI model?">
+  PA-PVP Mini is model-agnostic. It works with ChatGPT, Claude, Gemini, and any other instruction-following AI chat platform. The quality of the review will vary by model — a more capable model will apply the protocol's rules more precisely — but the behavioral contract the protocol establishes is the same regardless of which model you use. No special model features, plugins, or API access are required.
+</Accordion>
+
+<Accordion title="What if I don't have structured input?">
+  If your material lacks internal structure — no steps, no claims, no constraints, no logic to probe — PA-PVP Mini will produce little of value. Before submitting, consider adding minimal structure: break your idea into numbered points, state your assumptions explicitly, or write out the conditions under which your plan should hold. Even rough structure gives the protocol something to test. If the material genuinely cannot be structured, a different review approach is more appropriate.
+</Accordion>
+
+<Accordion title="Can I start from an existing review that wasn't generated by PA-PVP Mini?">
+  Yes. You do not have to start from a PA-PVP Mini round. If you already have a structured review, a list of findings, proposed fixes, tool output, or notes from another person, you can supply that as `PREVIOUS_ROUND_OUTPUT`. PA-PVP Mini will check that material against the artifact rather than simply accepting it — treating it as prior review content to audit, not as source authority.
+</Accordion>
+
+## Start reviewing
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="bolt" href="/quickstart">
+    Activate PA-PVP Mini and run your first adversarial review in under two minutes.
+  </Card>
+  <Card title="Two-AI Mode" icon="shuffle" href="/guides/two-ai-mode">
+    Run ping-pong reviews across two separate AI chats for maximum adversarial pressure.
+  </Card>
+</CardGroup>

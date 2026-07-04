@@ -1,0 +1,78 @@
+---
+title: "Single-AI Adversarial Review with PA-PVP Mini"
+sidebarTitle: "Single-AI Mode"
+description: "Run structured adversarial review with one AI chat session — covering activation, artifact submission, and multi-round continuation."
+---
+
+Single-AI mode is the simplest way to use PA-PVP Mini. You activate the protocol once inside a chat session, submit your artifact, and receive a structured list of findings. You can run multiple review rounds inside the same chat by re-submitting your original artifact alongside the previous round's output — no second AI needed.
+
+## Session flow
+
+<Steps>
+  <Step title="Paste the protocol into a fresh chat">
+    Open a new chat session with your AI of choice. Paste the full contents of `pa_pvp mini v2.3.txt` into the chat to activate PA-PVP Mini as the behavioral contract for that session. The AI will not return praise, narrative commentary, or style suggestions — only structured findings with evidence and fixes.
+  </Step>
+
+  <Step title="Submit your artifact with the ORIGINAL_ARTIFACT label">
+    Send the material you want reviewed. Label it explicitly so the protocol treats it as the primary source of truth:
+
+    ```text
+    ORIGINAL_ARTIFACT:
+    [your material]
+    ```
+
+    The artifact can be an idea, plan, prompt, procedure, code fix, proposal, spec, or AI-generated output — anything with internal structure the protocol can pressure-test.
+  </Step>
+
+  <Step title="Receive Round 1 FINDINGS">
+    The AI returns a Round 1 output. Every finding is labeled `INDEPENDENT` and includes:
+
+    - **what_breaks** — one concise statement of the problem
+    - **evidence** — observable reason anchored to your artifact
+    - **fix** — a structural change that addresses the problem
+    - **severity** — `HIGH`, `MED`, or `LOW`
+
+    The output closes with `END OF PROTOCOL`.
+  </Step>
+
+  <Step title="Continue to Round 2 by re-submitting with PREVIOUS_ROUND_OUTPUT">
+    To run a second round, send a new message that contains both your original artifact and the full Round 1 output:
+
+    ```text
+    ORIGINAL_ARTIFACT:
+    [your original material]
+
+    PREVIOUS_ROUND_OUTPUT:
+    [full Round 1 output from the AI]
+    ```
+
+    The AI runs a fresh independent review of the artifact first, then cross-checks Round 1's findings, and returns a Round 2 output that includes a `MERGE STATUS` block summarising what was confirmed, challenged, or newly found.
+  </Step>
+</Steps>
+
+## How round detection works
+
+PA-PVP Mini detects the current round automatically from the blocks you supply. If `PREVIOUS_ROUND_OUTPUT` is absent, the AI uses Round 1 behavior. If `PREVIOUS_ROUND_OUTPUT` is present, it switches to Round 2+ behavior — running an independent review first, then auditing the prior output. You never need to number rounds manually unless you want to override detection with an explicit `CURRENT_ROUND:` block.
+
+## Optional: MEMORY_NOTE
+
+`MEMORY_NOTE` is an optional short carry-over context block you can include alongside `PREVIOUS_ROUND_OUTPUT`. Use it to pass a brief note between sessions — for example, a constraint you added after Round 1, or context that isn't captured in the artifact itself. Like `PREVIOUS_ROUND_OUTPUT`, it is treated as audit material, not as source authority.
+
+```text
+ORIGINAL_ARTIFACT:
+[your material]
+
+MEMORY_NOTE:
+[short carry-over context]
+
+PREVIOUS_ROUND_OUTPUT:
+[full prior round output]
+```
+
+<Tip>
+  Use a fresh chat each time you activate PA-PVP Mini. Starting from a clean context prevents accumulated chat memory from influencing findings. The protocol is designed to work from explicit blocks only — past conversation turns are not part of its input contract.
+</Tip>
+
+<Note>
+  If you want a second, independent AI to challenge the same artifact and audit the first AI's findings, see [Two-AI Mode](/guides/two-ai-mode). Each AI operates in its own chat with no shared memory, making disagreements between them more meaningful.
+</Note>

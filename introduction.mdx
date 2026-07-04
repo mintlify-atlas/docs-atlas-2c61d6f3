@@ -1,0 +1,57 @@
+---
+title: "PA-PVP Mini: Adversarial Review Protocol for AI Chats"
+sidebarTitle: "Introduction"
+description: "PA-PVP Mini is a plain-text protocol that turns any AI chat into a structured adversarial reviewer — finding structural flaws, not offering praise."
+---
+
+PA-PVP Mini is a plain-text protocol file you paste into any AI chat session to turn that session into a structured adversarial reviewer. It gives the AI a strict behavioral contract: no praise, no narrative commentary, no style polish — only concrete findings with severity ratings, evidence anchored to your material, and structural fixes that can be checked, challenged, or applied. Whether you are reviewing an idea, a plan, a prompt, a procedure, a code fix, or an AI-generated answer that sounds plausible but needs pressure-testing, PA-PVP Mini puts it under adversarial review.
+
+<Note>
+  PA-PVP Mini is a **protocol file**, not a software library. There is nothing to install, no package to import, and no account to create. You activate it by pasting the contents of `pa_pvp mini v2.3.txt` directly into an AI chat session, or by uploading the file if your platform supports attachments.
+</Note>
+
+## Core philosophy
+
+The reviewer's job under PA-PVP Mini is not to improve your writing style or validate your effort. Its job is to find what breaks, what is weak, what is missing, and what structural fix should exist instead. Every finding the protocol produces must be **observable** (something you can see or verify), **specific** (not a vague concern), **actionable** (pointing to a concrete change), **structurally relevant** (affecting flow, behavior, constraints, decision rules, validation, or operational clarity), and **anchored to the `ORIGINAL_ARTIFACT`** (the actual material under review, not inferred context or prior assumptions).
+
+A finding with no valid fix is not a finding at all — the protocol requires the reviewer to exclude it. This keeps output tight: you receive only problems that have a clear structural path forward.
+
+## How rounds work
+
+PA-PVP Mini organizes review into numbered rounds.
+
+**Round 1** produces one independent full review using only your submitted artifact as the source of truth. All findings are labeled `INDEPENDENT`, meaning they were reached without reference to any prior review.
+
+**Round 2+** runs in strict order: first, the AI completes an independent review of the original artifact; then, it audits the prior round's output, confirming, challenging, or superseding earlier findings. This two-step sequence prevents the prior review from polluting the current independent pass.
+
+**Ping-pong mode** extends this across two separate AI chats. You activate PA-PVP Mini in AI-A, get Round 1, then activate it in AI-B and give it both the original artifact and AI-A's output. AI-B reviews the material independently and then challenges the previous review — two different models, zero shared memory, maximum adversarial pressure.
+
+## Input blocks
+
+PA-PVP Mini reads four named input blocks:
+
+| Block | Role |
+|---|---|
+| `ORIGINAL_ARTIFACT` | Required. The artifact under review and the only source of truth. |
+| `PREVIOUS_ROUND_OUTPUT` | Optional in Round 1, used in Round 2+ to supply the prior review for auditing. |
+| `MEMORY_NOTE` | Optional short carry-over note for context across sessions. Treated as audit material, not source authority. |
+| `CURRENT_ROUND` | Optional explicit round number. When present, overrides automatic round detection. |
+
+The protocol ignores chat memory, hidden context, and prior assistant assumptions unless they appear explicitly inside one of these blocks. Everything is on the page or it does not exist.
+
+## Explore further
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="bolt" href="/quickstart">
+    Activate PA-PVP Mini and run your first adversarial review in under two minutes.
+  </Card>
+  <Card title="Two-AI Mode" icon="shuffle" href="/guides/two-ai-mode">
+    Run ping-pong reviews across two separate AI chats for maximum adversarial pressure.
+  </Card>
+  <Card title="Input Blocks" icon="table-list" href="/reference/input-blocks">
+    Full reference for ORIGINAL_ARTIFACT, PREVIOUS_ROUND_OUTPUT, MEMORY_NOTE, and CURRENT_ROUND.
+  </Card>
+  <Card title="Output Format" icon="file-lines" href="/reference/output-format">
+    Understand every field in the ROUND header, FINDINGS block, MERGE STATUS, and END OF PROTOCOL marker.
+  </Card>
+</CardGroup>

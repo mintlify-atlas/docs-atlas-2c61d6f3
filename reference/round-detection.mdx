@@ -1,0 +1,47 @@
+---
+title: "Round Detection Logic in PA-PVP Mini"
+sidebarTitle: "Round Detection"
+description: "How PA-PVP Mini determines the current review round from input blocks — rules for CURRENT_ROUND, PREVIOUS_ROUND_OUTPUT, and MEMORY_NOTE."
+---
+
+Round detection is automatic — the protocol infers the current round from whichever input blocks are present. You can override this entirely by supplying `CURRENT_ROUND` explicitly, in which case no inference happens at all. When `CURRENT_ROUND` is absent, the protocol applies the rules below in strict priority order.
+
+## Detection Rules
+
+| Priority | Condition | Outcome |
+|---|---|---|
+| 1 | `CURRENT_ROUND` is explicitly provided | Use that value exactly — no inference |
+| 2 | Neither `PREVIOUS_ROUND_OUTPUT` nor `MEMORY_NOTE` is present | Round 1 |
+| 3 | Prior material is present and contains explicit round numbers | current = max(prior round numbers) + 1 |
+| 4 | Prior material is present but no round numbers are visible | Round 2 |
+
+Rules are evaluated top to bottom. The first matching condition determines the round; the remaining rules are not checked.
+
+## What Changes Between Rounds
+
+The round number controls two things: how findings are labeled, and whether a MERGE STATUS block appears in the output.
+
+**Round 1**
+- Every finding is labeled `INDEPENDENT`.
+- No MERGE STATUS block is produced.
+- The reviewer performs one full review of `ORIGINAL_ARTIFACT` with no reference to prior output.
+
+**Round 2+**
+- The reviewer first writes an independent review of `ORIGINAL_ARTIFACT` without consulting prior output. Only after that step is complete does it check prior findings.
+- Findings are labeled `INDEPENDENT`, `CONFIRMED`, `CHALLENGED`, or `NEW` depending on whether they match, contradict, or extend prior work.
+- A MERGE STATUS block appears at the end of the output with four fields: `confirmed_fixes_ready`, `challenged_items`, `new_fixes`, and `conflicts`.
+
+See [Output Format](/reference/output-format) for the full field definitions of both blocks.
+
+## Round Label Reference
+
+| Label | Appears in | Meaning |
+|---|---|---|
+| `INDEPENDENT` | Round 1 and Round 2+ | Finding produced without reference to prior output |
+| `CONFIRMED` | Round 2+ only | Prior finding re-observed and validated in this round |
+| `CHALLENGED` | Round 2+ only | Prior finding rejected, overstated, duplicated, or weak |
+| `NEW` | Round 2+ only | Finding not present in prior output |
+
+<Tip>
+  Supply `CURRENT_ROUND` explicitly whenever you want to reset the counter, force a repeat of Round 1 on revised content, or prevent ambiguity when prior material contains inconsistent or missing round numbers. It is the most reliable way to control round behavior.
+</Tip>

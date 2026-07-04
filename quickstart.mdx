@@ -1,47 +1,108 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Get Started with PA-PVP Mini Adversarial Review"
+sidebarTitle: "Quickstart"
+description: "Learn how to activate PA-PVP Mini in any AI chat and run your first adversarial review in under two minutes."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
-
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
-
-## Prerequisites
-
-Before you begin, you must have:
-
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
-
-## Get started
+PA-PVP Mini requires no installation and works with any AI chat platform — ChatGPT, Claude, Gemini, or any other model. All you need is the protocol file and something you want reviewed. The steps below walk you through activating the protocol and getting your first structured adversarial review back.
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
 
-    ```bash
-    npm install your-package
+  <Step title="Get the protocol file">
+    Download or copy `pa_pvp mini v2.3.txt` from the official repository:
+
+    ```text
+    https://github.com/XxYouDeaDPunKxX/PA-PVP-mini
+    ```
+
+    The file contains the full behavioral contract that PA-PVP Mini imposes on the AI session. Keep it somewhere easy to access — you will paste it (or upload it) at the start of every new review session.
+  </Step>
+
+  <Step title="Open a new AI chat session">
+    Start a fresh conversation in any AI chat platform. PA-PVP Mini is model-agnostic: it works with ChatGPT, Claude, Gemini, and any other instruction-following model. Using a **new** session matters — it prevents prior context from leaking into the review.
+  </Step>
+
+  <Step title="Activate the protocol">
+    Paste the **full text** of `pa_pvp mini v2.3.txt` into the chat as your first message. If your platform supports file attachments, you can upload the file directly instead.
+
+    Pasting the protocol establishes it as the behavioral contract for the session. The AI will now act as an adversarial reviewer for everything that follows: no praise, no narrative, only findings with severity, evidence, and structural fixes.
+
+    <Tip>
+      Some platforms impose message-length limits. If pasting the full protocol fails, use the file upload option instead — most modern AI platforms (ChatGPT, Claude, Gemini) support it.
+    </Tip>
+  </Step>
+
+  <Step title="Send your artifact">
+    In your next message, submit the material you want reviewed. Label it explicitly using the `ORIGINAL_ARTIFACT` block for cleaner, more reliable results:
+
+    ```text
+    ORIGINAL_ARTIFACT:
+    [your material here]
+    ```
+
+    For example, submitting a short deployment procedure looks like this:
+
+    ```text
+    ORIGINAL_ARTIFACT:
+    1. SSH into the production server.
+    2. Pull the latest code from the main branch.
+    3. Restart the application service.
+    4. Verify the service is running.
+    ```
+
+    The protocol treats `ORIGINAL_ARTIFACT` as the single source of truth. Every finding the AI produces will be anchored to this block — not to prior chat history or assumptions.
+
+    <Tip>
+      Always use the `ORIGINAL_ARTIFACT:` label explicitly. Without it, the AI may still produce a review, but labeling your input clearly prevents ambiguity and keeps findings anchored to the right material.
+    </Tip>
+  </Step>
+
+  <Step title="Read the Round 1 output">
+    The AI returns a structured response that follows the PA-PVP Mini output format. Here is what each section means:
+
+    **ROUND header** — confirms which round was run and the mode:
+
+    ```text
+    ROUND:
+    - current_round: 1
+    - round_mode: ROUND 1
+    ```
+
+    **FINDINGS block** — each finding includes a one-line identifier, severity, label, what breaks, evidence anchored to your artifact, and a concrete structural fix:
+
+    ```text
+    FINDINGS:
+    - [finding_id] [fix_id] [origin_round] [NONE] [HIGH/MED/LOW] [INDEPENDENT]
+    - what_breaks: [one concise statement]
+    - evidence: [observable reason anchored to ORIGINAL_ARTIFACT]
+    - fix: [structural fix]
+    ```
+
+    All Round 1 findings carry the `INDEPENDENT` label, meaning they were reached by reviewing your artifact alone with no prior review to reference. Severity uses three levels: `HIGH` (breaks core function or correctness), `MED` (weakens reliability or robustness), and `LOW` (real structural weakness with limited blast radius).
+
+    **END OF PROTOCOL marker** — signals that the full review is complete:
+
+    ```text
+    END OF PROTOCOL
     ```
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
 
-    ```bash
-    your-cli init
-    ```
-  </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+  <Step title="Optional: continue to Round 2">
+    Once you have Round 1 output, you can start a second adversarial pass. Open a new AI chat session (a different model is ideal), activate PA-PVP Mini again, then submit the original artifact together with the full Round 1 output:
 
-    ```bash
-    your-cli start
+    ```text
+    ORIGINAL_ARTIFACT:
+    [your original material]
+
+    PREVIOUS_ROUND_OUTPUT:
+    [paste the full Round 1 output here]
     ```
+
+    The AI will first review the artifact independently, then audit the prior round's findings — confirming, challenging, or superseding them. Each round carries the review forward without requiring shared memory between chats.
+
+    <Note>
+      Running reviews across two separate AI chats — "ping-pong mode" — is the most powerful way to use PA-PVP Mini. See the [Two-AI Mode guide](/guides/two-ai-mode) for the full workflow.
+    </Note>
   </Step>
+
 </Steps>
-
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
-
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>

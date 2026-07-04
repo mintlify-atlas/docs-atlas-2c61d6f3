@@ -1,0 +1,81 @@
+---
+title: "How to Apply Fixes from PA-PVP Mini Reviews"
+sidebarTitle: "Applying Fixes"
+description: "Understand which PA-PVP Mini findings deserve action, how to prioritize fixes across rounds, and when to skip a finding."
+---
+
+PA-PVP Mini produces a list of findings with fixes — but not every finding is equally ready to act on. Applying fixes automatically without judgment defeats the purpose of the review. The right approach is to use the protocol's own output signals — labels, severity, and `MERGE STATUS` — as a triage guide before touching anything.
+
+## The core principle
+
+Do not apply every finding automatically. A finding is worth acting on when it has clear evidence anchored to the artifact and points to a structural change — a change in flow, constraints, decision rules, validation, behavior, or operational clarity. Findings that address only wording are only worth acting on if the wording creates real ambiguity in how the artifact works.
+
+## What makes a finding worth acting on
+
+A finding has earned action when it meets most of the following criteria:
+
+<CardGroup cols={2}>
+  <Card title="Clear evidence" icon="magnifying-glass">
+    The finding's `evidence` line is anchored directly to the `ORIGINAL_ARTIFACT` — not to the prior review, not to a general pattern, and not to something outside the artifact.
+  </Card>
+  <Card title="Confirmed across rounds" icon="circle-check">
+    The finding carries a `CONFIRMED` label, meaning a second independent AI reviewed the artifact and reached the same conclusion without being influenced by the prior finding.
+  </Card>
+  <Card title="Structural relevance" icon="sitemap">
+    The fix changes at least one of: structure, behavior, constraints, decision rules, flow, validation, or operational clarity. A fix that changes only surface wording without affecting meaning is not structural.
+  </Card>
+  <Card title="Not challenged" icon="shield-halved">
+    The finding has not been labeled `CHALLENGED` by a subsequent round. A challenge means a second AI found the finding invalid, overstated, duplicated, or not anchored to the artifact.
+  </Card>
+</CardGroup>
+
+## What to skip or defer
+
+<Accordion title="Only one round, not yet confirmed">
+  A finding that appears in Round 1 and has not been reviewed by a second pass is an unconfirmed signal. It may be valid — but it has not been pressure-tested. Defer HIGH-severity single-round findings to investigation; deprioritize MED and LOW until a second round confirms them.
+</Accordion>
+
+<Accordion title="CHALLENGED by the next round">
+  If a subsequent round labels a prior finding as `CHALLENGED`, a second AI examined the artifact independently and found the finding invalid, overstated, duplicated, or weak. Do not apply the fix until you have investigated the disagreement yourself. The `challenged_items` field in `MERGE STATUS` will explain what the challenge is and whether a replacement fix was offered.
+</Accordion>
+
+<Accordion title="Pure wording fixes that don't change structure or behavior">
+  PA-PVP Mini excludes pure wording fixes from its findings unless the wording change removes ambiguity that affects how the artifact actually works. If a finding slips through that only proposes a rephrasing without any structural consequence, skip it.
+</Accordion>
+
+## Using MERGE STATUS as a triage guide
+
+Round 2+ outputs include a `MERGE STATUS` block. Use it as a prioritized action list before reading individual findings:
+
+<CardGroup cols={2}>
+  <Card title="confirmed_fixes_ready → High priority" icon="circle-check">
+    These fixes survived an independent re-review of the artifact. They have been validated by two separate passes and are the strongest candidates for immediate action.
+  </Card>
+  <Card title="challenged_items → Investigate before acting" icon="magnifying-glass">
+    A prior finding or fix was disputed. Read both positions, check the artifact yourself, and decide whether the original finding, the challenge, or neither is correct.
+  </Card>
+  <Card title="new_fixes → One more round of validation" icon="circle-plus">
+    Fresh findings from the current round that were not in any prior round. They are unconfirmed. Run another round or review them manually before applying.
+  </Card>
+  <Card title="conflicts → Human judgment required" icon="triangle-exclamation">
+    Direct contradictions between the current independent review and the prior audit position. These are declared explicitly and cannot be resolved by the protocol — they require you to read both positions and make a call.
+  </Card>
+</CardGroup>
+
+## Severity and urgency
+
+Severity levels give you a second axis for prioritization independent of confirmation status:
+
+| Severity | Meaning | Action |
+|----------|---------|--------|
+| `HIGH` | Breaks core function, correctness, execution viability, or downstream trust | Review immediately, even if unconfirmed. A HIGH finding that breaks core function is worth investigating before the next round. |
+| `MED` | Weakens reliability, robustness, auditability, or prioritization without core collapse | Prioritize confirmed MED findings; defer unconfirmed ones to the next round. |
+| `LOW` | Real structural weakness with limited blast radius | Act on confirmed LOW findings when you have bandwidth; skip unconfirmed LOW findings until further rounds. |
+
+<Warning>
+  A finding that appears only once in a single round is a weaker signal than one that has survived a cross-AI challenge. Treat single-round findings — especially at MED and LOW severity — as hypotheses to be tested in a subsequent round, not conclusions to act on immediately.
+</Warning>
+
+<Tip>
+  Use round progression as a natural triage mechanism. A fix that was `INDEPENDENT` in Round 1 and `CONFIRMED` in Round 2 by a different AI has passed two separate reviews with no shared memory. That convergence is the strongest confidence signal the protocol produces — stronger than any single finding regardless of its severity label.
+</Tip>

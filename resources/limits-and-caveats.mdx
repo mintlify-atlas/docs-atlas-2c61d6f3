@@ -1,0 +1,76 @@
+---
+title: "PA-PVP Mini Limits, Caveats, and When Not to Trust It"
+sidebarTitle: "Limits & Caveats"
+description: "Understand what PA-PVP Mini cannot do, how model quality affects results, and when to treat its findings with extra skepticism."
+---
+
+PA-PVP Mini is a review aid, not an authority. It applies a structured adversarial protocol to surface gaps, weak logic, and fragile assumptions — but it cannot verify correctness, and its output is only as reliable as the AI model executing it. Before acting on any finding, read it critically, check it against your artifact, and decide whether the evidence actually holds.
+
+## What it does not guarantee
+
+PA-PVP Mini identifies structural problems it can observe from the artifact you provide. It does not do more than that.
+
+<Warning>
+  PA-PVP Mini does not prove that your artifact is correct. A clean run — zero findings — means the reviewer found no observable structural problems within the constraints of the protocol. It does not mean the artifact is safe, complete, or production-ready.
+</Warning>
+
+- **Correctness is not verified.** The protocol looks for what breaks, what is weak, and what is missing. It does not confirm that what remains is right.
+- **Not every problem is found.** The protocol caps findings at five per round and keeps only the strongest. A complex artifact may have more than five real problems; the rest are cut, not cleared.
+- **Domain-specific constraints may be invisible.** If the artifact depends on regulatory rules, organizational policy, proprietary systems, or context the AI was never given, those constraints are outside the reviewer's view. Findings in those areas may be shallow or entirely absent.
+- **Finding quality depends on the underlying model.** A weaker model may produce vague evidence lines, miss structural issues, or fail to distinguish between a real structural fix and a wording suggestion.
+
+## Model dependence
+
+The protocol text defines the reviewer's rules and output format, but the actual analysis is performed by whatever AI model is reading it. The protocol cannot compensate for a model that lacks the reasoning depth to apply it well.
+
+<Warning>
+  A weaker model may return findings that look structurally valid but are actually shallow, misanchored, or based on a misreading of the artifact. Always sanity-check each finding against your artifact before treating it as confirmed. If the evidence line does not actually appear in or follow from the artifact, discard the finding.
+</Warning>
+
+When you get a finding, ask:
+
+- Does the `evidence` line point to something that is actually in the artifact?
+- Does the `fix` change structure, behavior, constraints, decision rules, flow, validation, or operational clarity — or is it a wording suggestion in disguise?
+- Would a second reviewer looking at the artifact agree the problem exists?
+
+If the answer to any of those is no, treat the finding with skepticism regardless of its severity label.
+
+## The 5-finding cap as a limit, not a completion signal
+
+The protocol allows a maximum of five structural findings per round. If more than five valid problems exist in the artifact, the reviewer keeps the strongest and cuts the weakest. The cut findings do not appear in the output and are not flagged as missing.
+
+This means a single round on a large or complex artifact may surface only a portion of its real problems. The cap is a deliberate constraint to force prioritization — it is not a claim that the artifact has at most five issues.
+
+Running multiple rounds, or running the same artifact through a second AI session, increases the chance that important problems not captured in the first round get surfaced.
+
+## Single-round confidence
+
+A finding that appears only in Round 1 is unconfirmed. It represents one reviewer's independent assessment at one point in time. The reviewer may be correct — but the finding has not been tested against a second independent review.
+
+Treat a Round 1 finding as a hypothesis:
+
+- It points to something worth investigating.
+- It should not be the sole basis for a high-stakes structural change.
+- If a Round 2 reviewer running independently on the same artifact confirms the finding, confidence increases. If Round 2 challenges it, investigate the disagreement before acting.
+
+The `CONFIRMED`, `CHALLENGED`, and `NEW` labels in Round 2+ output exist precisely because single-round findings need external pressure-testing before they earn full weight.
+
+## No shared memory between chats
+
+When using PA-PVP Mini across two AI sessions, neither AI has access to the other's session memory. The only information the second AI receives about the first round is what you explicitly paste into the `PREVIOUS_ROUND_OUTPUT` block.
+
+If you truncate, summarize, or reformat the previous round's output before pasting it, the second AI is auditing your edited version — not the original. Any structural detail you omit is invisible to Round 2.
+
+Copy the full previous round output without modification when passing between chats.
+
+## AI-assisted development disclosure
+
+PA-PVP Mini itself was developed with AI assistance. The protocol, documentation, and repository materials were shaped through human-directed work supported by AI tools during drafting, structuring, review, and refinement.
+
+<Warning>
+  AI assistance in building this protocol does not make it automatically correct, complete, or suitable for every use case. The protocol has not been formally verified. Read it, test it on your own artifacts, and adapt it to your context. Do not treat it as an authority simply because it produces structured output.
+</Warning>
+
+<Note>
+  Once you have a set of findings, not all of them warrant immediate action. See [Applying Fixes](/guides/applying-fixes) for guidance on how to triage findings, decide which ones to act on, and when to run additional rounds before committing to a change.
+</Note>

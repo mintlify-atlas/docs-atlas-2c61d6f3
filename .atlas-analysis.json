@@ -1,0 +1,78 @@
+{
+  "projectType": "general",
+  "projectName": "PA-PVP Mini",
+  "projectDescription": "A structured adversarial review protocol that stress-tests ideas, plans, prompts, procedures, code, and AI outputs by activating an AI as a critical reviewer that finds gaps, weak logic, missing constraints, and shaky fixes — with optional ping-pong mode across two AI chats.",
+  "theme": "luma",
+  "primaryColor": "#E63946",
+  "lightColor": "#FF6B6B",
+  "darkColor": "#C1121F",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "when-to-use"
+            ]
+          },
+          {
+            "group": "Using the Protocol",
+            "pages": [
+              "guides/single-ai-mode",
+              "guides/two-ai-mode",
+              "guides/starting-from-existing-review",
+              "guides/applying-fixes"
+            ]
+          },
+          {
+            "group": "Protocol Reference",
+            "pages": [
+              "reference/input-blocks",
+              "reference/round-detection",
+              "reference/review-rules",
+              "reference/output-format",
+              "reference/severity-levels"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "resources/limits-and-caveats",
+              "resources/examples",
+              "resources/license"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Adversarial review protocol that forces AI to find structural flaws, not offer praise",
+    "Ping-pong mode: two independent AI chats challenge the same artifact in alternating passes",
+    "Structured finding format with severity levels (HIGH/MED/LOW), evidence anchoring, and concrete fixes",
+    "Provenance tracking across review rounds with finding IDs and derived_from lineage",
+    "Merge Status in Round 2+ to confirm, challenge, or surface new fixes",
+    "Round detection logic to automatically manage multi-round review sessions",
+    "Section concentration rule to prevent reviews from over-focusing on one area",
+    "Works on any structured artifact: plans, prompts, code, specs, checklists, decisions"
+  ],
+  "publicApiSurface": [
+    "ORIGINAL_ARTIFACT input block",
+    "PREVIOUS_ROUND_OUTPUT input block",
+    "MEMORY_NOTE input block",
+    "CURRENT_ROUND input block",
+    "ROUND 1 review mode",
+    "ROUND 2+ review mode",
+    "FINDINGS output block",
+    "MERGE STATUS output block",
+    "HIGH/MED/LOW severity labels",
+    "INDEPENDENT/CONFIRMED/CHALLENGED/NEW finding labels",
+    "finding_id / fix_id / origin_round / derived_from provenance fields",
+    "SECTION OVERLOAD JUSTIFIED marker",
+    "END OF PROTOCOL marker"
+  ]
+}

@@ -1,0 +1,74 @@
+---
+title: "Start PA-PVP Mini from an Existing Review"
+sidebarTitle: "Existing Review"
+description: "Use PA-PVP Mini to audit an existing review, findings list, or tool output — not just to start a fresh review from scratch."
+---
+
+You do not need a prior PA-PVP Mini round to use PA-PVP Mini in Round 2+ mode. If you already have a structured review, a findings list from a colleague, linter output, a security audit, or any other prior analysis, you can feed it directly into the protocol as `PREVIOUS_ROUND_OUTPUT`. PA-PVP Mini will treat it as audit material — checking it against the original artifact rather than simply accepting its conclusions.
+
+## What qualifies as valid prior material
+
+`PREVIOUS_ROUND_OUTPUT` accepts any structured prior analysis, including:
+
+<CardGroup cols={2}>
+  <Card title="Previous PA-PVP rounds" icon="rotate">
+    Output from an earlier PA-PVP Mini session, whether run by you or another person.
+  </Card>
+  <Card title="Findings lists from colleagues" icon="users">
+    Peer review notes, code review comments, or structured feedback from a team member.
+  </Card>
+  <Card title="Tool output" icon="wrench">
+    Linter results, static analysis output, security audit findings, or any structured diagnostic output.
+  </Card>
+  <Card title="Notes and informal reviews" icon="note-sticky">
+    Structured notes, decision memos with objections listed, or findings from a prior meeting.
+  </Card>
+</CardGroup>
+
+The material does not need to follow PA-PVP Mini's output format. What matters is that it contains reviewable claims about the artifact that the protocol can check.
+
+## How PA-PVP Mini treats prior material
+
+`ORIGINAL_ARTIFACT` is always the primary source of truth. `PREVIOUS_ROUND_OUTPUT` — regardless of where it came from — is audit material. PA-PVP Mini runs a full independent review of the artifact first, then cross-checks the prior findings against that review. It will confirm what holds up, challenge what doesn't, and surface anything the prior review missed.
+
+This means the protocol never inherits the prior review's conclusions uncritically. A finding from a colleague or a tool is treated the same way as a finding from a previous PA-PVP round: it must be defensible against the artifact or it gets challenged.
+
+## Input format
+
+Use the same two-block format regardless of where your prior material came from:
+
+```text
+ORIGINAL_ARTIFACT:
+[your material]
+
+PREVIOUS_ROUND_OUTPUT:
+[your existing review or findings]
+```
+
+Paste the full contents of `pa_pvp mini v2.3.txt` into the chat first to activate the protocol, then send this input.
+
+## What the AI does with it
+
+PA-PVP Mini executes Round 2+ behavior in strict order:
+
+1. Produces a complete independent review of `ORIGINAL_ARTIFACT` — without referencing the prior material at all
+2. Cross-checks the prior findings against that independent review
+3. Returns a merged output with `CONFIRMED`, `CHALLENGED`, and `NEW` labels on every finding, plus a `MERGE STATUS` block
+
+The result is a structured audit of both the artifact and the prior review — making explicit what the prior review got right, what it missed, and where it overreached.
+
+<Note>
+  Supplying `PREVIOUS_ROUND_OUTPUT` automatically triggers Round 2+ behavior. You do not need to set a round number manually. If your prior material contains explicit round numbers, PA-PVP Mini will set the current round to the highest prior round number plus one. If no round numbers are present, it defaults to Round 2.
+</Note>
+
+<Tip>
+  If you have only a short piece of carry-over context — a constraint that was added after the review, a known exception, or a brief clarification — use `MEMORY_NOTE` instead of `PREVIOUS_ROUND_OUTPUT`. It is treated as audit material in the same way, but is the right block for context that is not itself a structured review.
+
+  ```text
+  ORIGINAL_ARTIFACT:
+  [your material]
+
+  MEMORY_NOTE:
+  [short carry-over context]
+  ```
+</Tip>

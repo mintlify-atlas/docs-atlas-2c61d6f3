@@ -1,0 +1,196 @@
+---
+title: "PA-PVP Mini Example Review Sessions"
+sidebarTitle: "Examples"
+description: "Worked examples showing PA-PVP Mini in action — Round 1 review, a Round 2 cross-AI challenge, and reviewing an existing findings list."
+---
+
+These examples show the protocol in action on realistic artifacts. Each one covers a distinct usage pattern: a first-pass independent review, a cross-AI Round 2 challenge, and starting from an existing structured review rather than a clean slate. Read through the annotated input and output blocks to understand what the protocol produces and why.
+
+<Note>
+  For the full field-by-field reference for `FINDINGS`, `MERGE STATUS`, and all output blocks, see [Output Format](/reference/output-format).
+</Note>
+
+<Tabs>
+  <Tab title="Example 1: Round 1 Review">
+
+## Round 1 review of a deployment procedure
+
+This example shows a straightforward first-pass review. The artifact is a short deployment procedure submitted without any prior round output, so the protocol runs as Round 1 and labels all findings `INDEPENDENT`.
+
+**The input** — paste the protocol into the chat first, then send the artifact labeled as `ORIGINAL_ARTIFACT`:
+
+```text
+ORIGINAL_ARTIFACT:
+Deployment Procedure — Frontend Service v2.1
+
+1. Pull the latest changes from the main branch.
+2. Run the test suite and confirm all tests pass.
+3. Build the production bundle using `npm run build`.
+4. Copy the build output to the staging server.
+5. Notify the team in Slack that deployment is complete.
+```
+
+The protocol receives no `PREVIOUS_ROUND_OUTPUT` and no `CURRENT_ROUND` block, so it infers Round 1.
+
+**The output** — the AI returns a structured findings block:
+
+```text
+ROUND:
+- current_round: 1
+- round_mode: ROUND 1
+
+FINDINGS:
+- rollback rollback-step 1 NONE HIGH INDEPENDENT
+- what_breaks: No rollback path exists if the build or copy step fails mid-deployment.
+- evidence: Steps 3 and 4 describe irreversible changes (bundle built, files copied) with no step for reverting to the previous version on failure.
+- fix: Add an explicit rollback step that restores the previous build artifact if step 3 or 4 fails, and define the condition that triggers it.
+
+- staging-validation staging-gate 1 NONE MED INDEPENDENT
+- what_breaks: The procedure moves directly from copying to staging to notifying the team, with no validation that the staging deployment is functional.
+- evidence: Step 4 copies files to staging. Step 5 announces completion. No step checks that the deployed version starts, serves traffic, or passes a smoke test.
+- fix: Insert a validation step between step 4 and step 5 that defines a minimum acceptance check (e.g., health endpoint responds, login flow completes) before the team is notified.
+
+- notification-accuracy notification-content 1 NONE LOW INDEPENDENT
+- what_breaks: The Slack notification in step 5 carries no structured information, making it unusable for audit or incident triage.
+- evidence: Step 5 says "notify the team" with no required fields — no version, no deployer identity, no timestamp, no outcome status.
+- fix: Define a required notification format for step 5 that includes at minimum: version deployed, deployer name, deployment time, and pass/fail outcome.
+
+END OF PROTOCOL
+```
+
+**Reading the output:**
+
+Each finding line contains — in order — `finding_id`, `fix_id`, `origin_round`, `derived_from`, severity, and status label. All three findings are `INDEPENDENT` because this is Round 1 and there is no prior review to confirm or challenge. The `rollback` finding is `HIGH` because a missing rollback path directly affects execution viability. The other two are `MED` and `LOW` respectively, consistent with the protocol's requirement to choose the lower severity when ambiguous and justify it through the evidence line.
+
+  </Tab>
+  <Tab title="Example 2: Round 2 Cross-AI Challenge">
+
+## Round 2 cross-AI challenge
+
+This example continues from Example 1. After collecting Round 1 output from AI-A, you open a new chat, activate PA-PVP Mini, and send the same artifact along with the full Round 1 output. AI-B runs an independent review first, then audits the prior findings.
+
+**The input** — send the artifact and the previous round output together:
+
+```text
+ORIGINAL_ARTIFACT:
+Deployment Procedure — Frontend Service v2.1
+
+1. Pull the latest changes from the main branch.
+2. Run the test suite and confirm all tests pass.
+3. Build the production bundle using `npm run build`.
+4. Copy the build output to the staging server.
+5. Notify the team in Slack that deployment is complete.
+
+PREVIOUS_ROUND_OUTPUT:
+ROUND:
+- current_round: 1
+- round_mode: ROUND 1
+
+FINDINGS:
+- rollback rollback-step 1 NONE HIGH INDEPENDENT
+- what_breaks: No rollback path exists if the build or copy step fails mid-deployment.
+- evidence: Steps 3 and 4 describe irreversible changes with no step for reverting to the previous version on failure.
+- fix: Add an explicit rollback step that restores the previous build artifact if step 3 or 4 fails, and define the condition that triggers it.
+
+- staging-validation staging-gate 1 NONE MED INDEPENDENT
+- what_breaks: The procedure moves directly from copying to staging to notifying the team with no validation that the staging deployment is functional.
+- evidence: Step 4 copies files to staging. Step 5 announces completion. No step checks that the deployed version starts or passes a smoke test.
+- fix: Insert a validation step between step 4 and step 5 that defines a minimum acceptance check before the team is notified.
+
+- notification-accuracy notification-content 1 NONE LOW INDEPENDENT
+- what_breaks: The Slack notification carries no structured information.
+- evidence: Step 5 says "notify the team" with no required fields.
+- fix: Define a required notification format for step 5 that includes version, deployer name, deployment time, and outcome.
+
+END OF PROTOCOL
+```
+
+AI-B detects `PREVIOUS_ROUND_OUTPUT` and sets `current_round: 2`. It runs its independent review first, then audits the prior findings.
+
+**The output:**
+
+```text
+ROUND:
+- current_round: 2
+- round_mode: ROUND 2+
+
+FINDINGS:
+- rollback rollback-step 1 NONE HIGH CONFIRMED
+- what_breaks: No rollback path exists if steps 3 or 4 fail.
+- evidence: Steps 3 and 4 make irreversible changes to the staging environment. No failure condition or recovery step is defined anywhere in the procedure.
+- fix: Add a conditional rollback step with an explicit trigger condition (step 3 or 4 failure) and a defined recovery action (restore prior build artifact).
+
+- staging-validation staging-gate 1 NONE MED CONFIRMED
+- what_breaks: Deployment is announced complete before any functional check of the staging environment.
+- evidence: Step 5 follows step 4 directly. The procedure contains no health check, smoke test, or minimum acceptance criteria.
+- fix: Insert a named validation step between step 4 and step 5 specifying the minimum acceptance check required before notification is sent.
+
+- branch-pinning branch-pin 2 NONE MED NEW
+- what_breaks: Step 1 pulls from the main branch without specifying a commit, tag, or release marker, making the procedure non-reproducible.
+- evidence: "Pull the latest changes from the main branch" does not anchor the deployment to a specific artifact version. Two executions of the same procedure may deploy different code.
+- fix: Replace step 1 with a step that checks out a specific tagged release or commit SHA and requires that value to be recorded in the deployment log.
+
+- notification-accuracy notification-content 1 NONE LOW CHALLENGED
+- what_breaks: Prior finding: notification carries no structured information.
+- evidence: The prior fix (require version, deployer, time, outcome) is structurally valid but the severity label LOW understates the impact — an unstructured notification actively impedes incident triage when the rollback finding is triggered.
+- fix: Retain the fix from Round 1 but escalate severity to MED given the dependency on this notification for rollback audit trails.
+
+MERGE STATUS:
+- confirmed_fixes_ready: rollback-step Confirmed across both rounds with consistent evidence and matching fix direction.
+- confirmed_fixes_ready: staging-gate Confirmed across both rounds; fix direction is consistent.
+- challenged_items: notification-content Severity understated given rollback dependency; escalate to MED and retain structured notification requirement.
+- new_fixes: branch-pin Non-reproducible deployment source not identified in Round 1; anchoring to a specific commit or tag is a structural requirement.
+- conflicts: NONE
+
+END OF PROTOCOL
+```
+
+**What CONFIRMED vs CHALLENGED means in practice:**
+
+`CONFIRMED` means AI-B ran an independent review and arrived at the same structural problem independently. The finding has now been validated by two reviewers working from the same artifact without sharing session context. `confirmed_fixes_ready` in MERGE STATUS signals that the fix is ready to act on.
+
+`CHALLENGED` does not mean the finding is wrong — it means AI-B disagrees with some aspect of it. In this case, the `notification-accuracy` finding is challenged on severity, not validity. The problem is real; the label is disputed. `challenged_items` in MERGE STATUS records the reason and the suggested replacement. Investigate the disagreement before deciding which position to adopt.
+
+`NEW` means AI-B found a problem that Round 1 did not identify. Treat it with the same single-round caution as an `INDEPENDENT` Round 1 finding — it is real enough to surface but has not yet been confirmed by a second independent review.
+
+  </Tab>
+  <Tab title="Example 3: Existing Review as Input">
+
+## Starting from an existing structured review
+
+You do not have to generate a Round 1 from PA-PVP Mini before running Round 2. If you already have a structured findings list — from a colleague, a linter report, a static analysis tool, or a manual code review — you can feed it as `PREVIOUS_ROUND_OUTPUT` directly.
+
+**The input:**
+
+```text
+ORIGINAL_ARTIFACT:
+Access Control Policy — Internal API v1.4
+
+- All endpoints require a valid JWT token.
+- Admin endpoints require the `admin` role claim.
+- Tokens expire after 24 hours.
+- Rate limiting is applied at the gateway: 100 requests per minute per IP.
+
+PREVIOUS_ROUND_OUTPUT:
+Code review notes from team lead (2024-06-10):
+- The 24-hour token expiry is too long for admin tokens.
+- Rate limiting by IP is ineffective for shared office networks.
+- No mention of token revocation on logout or role change.
+```
+
+The previous round material here is a plain colleague review, not a PA-PVP Mini output. It has no `ROUND:` header, no `finding_id` fields, and no provenance lines.
+
+**How PA-PVP Mini treats it:**
+
+PA-PVP Mini treats `PREVIOUS_ROUND_OUTPUT` as audit material, not as a source of authority. Regardless of where the prior material came from — a teammate, a tool, or a previous PA-PVP session — it gets the same treatment: the AI runs an independent review of `ORIGINAL_ARTIFACT` first, then checks whether the prior review's claims hold up against that independent assessment.
+
+The prior review notes become `CONFIRMED`, `CHALLENGED`, or unaddressed based on whether the independent review finds supporting evidence in the artifact. A claim in the prior notes that is not anchored to something observable in the artifact may be challenged. A claim that is clearly supported may be confirmed.
+
+This means PA-PVP Mini does not simply ratify the existing review. It audits it. If your colleague's note about token expiry is structurally sound and anchored to the artifact, it will likely be confirmed and carry forward into `confirmed_fixes_ready`. If one of the notes is vague, not anchored, or overstated, it may appear in `challenged_items` with a reason.
+
+**The practical value:**
+
+This mode is useful when you want a second opinion on existing review output without knowing whether that output was rigorous. PA-PVP Mini applies the same evidence and fix requirements to prior findings whether they came from a human reviewer or a previous AI session. Prior material that cannot survive that scrutiny gets flagged.
+
+  </Tab>
+</Tabs>

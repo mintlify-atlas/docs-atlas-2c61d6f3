@@ -1,0 +1,37 @@
+---
+title: "Severity Levels in PA-PVP Mini Findings"
+sidebarTitle: "Severity Levels"
+description: "How PA-PVP Mini assigns HIGH, MED, and LOW severity to findings — definitions, tiebreaker rules, and how severity guides fix prioritization."
+---
+
+Severity has exactly three levels. Each level has a specific definition from the protocol — there is no room for subjective escalation. When severity is ambiguous, a tiebreaker rule forces the lower value and requires an explanation, which prevents inflation and keeps severity meaningful across rounds.
+
+## Severity Levels
+
+| Severity | Definition | Typical examples |
+|---|---|---|
+| `HIGH` | Breaks core function, correctness, execution viability, or downstream trust | Missing termination condition, undefined behavior on valid input, output that corrupts downstream consumers, logic that silently produces wrong results |
+| `MED` | Weakens reliability, robustness, auditability, or prioritization without causing core collapse | Retry logic with no cap, missing audit trail for state changes, ambiguous priority ordering between two rules, no error surface for recoverable failures |
+| `LOW` | Real structural weakness with limited blast radius | Inconsistent naming convention that could cause confusion in one edge case, a constraint that is technically present but not enforced in one minor branch |
+
+## Tiebreaker Rule
+
+When the severity of a finding is ambiguous — meaning it could reasonably be assigned either of two adjacent levels — the protocol requires the reviewer to choose the **lower** severity and explain why. The explanation must be included in the finding output.
+
+This rule serves two purposes: it prevents severity inflation, and it makes the reviewer's reasoning visible. A finding that is upgraded from LOW to HIGH without a clear rationale is a signal that the reviewer is overstating impact.
+
+<Tip>
+  The tiebreaker rule keeps the reviewer honest. Severity cannot be inflated silently — any time the boundary between two levels is unclear, the lower level is assigned and the reasoning is stated. If you see a HIGH finding and disagree with the severity, the absence of a tiebreaker explanation in that finding is itself a structural weakness you can surface in the next round.
+</Tip>
+
+## Using Severity for Fix Prioritization
+
+Severity is the primary signal for ordering fixes, but it should not be read in isolation across rounds.
+
+**Start with HIGH findings.** A HIGH finding indicates a problem that breaks core function or correctness. These must be resolved before the artifact can be considered structurally sound.
+
+**Treat CONFIRMED MED findings seriously.** A MED finding that has been confirmed across two or more rounds — meaning the independent reviewer identified it independently and it survived challenge — is a more reliable signal than a single-round HIGH finding. Confirmation across rounds removes the possibility that a finding was overstated or misread in one pass.
+
+**Do not dismiss LOW findings as noise.** LOW findings are real structural weaknesses. They have limited blast radius in isolation, but they can interact with other weaknesses in ways that elevate impact. A CONFIRMED LOW finding that has survived multiple rounds warrants attention even if its standalone severity appears minor.
+
+The combination of severity and round label gives the most complete picture. A single-round HIGH that gets `CHALLENGED` in Round 2 may deserve less immediate action than a CONFIRMED MED that has appeared in every round.

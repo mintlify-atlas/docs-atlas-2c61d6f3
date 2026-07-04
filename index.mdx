@@ -1,20 +1,66 @@
 ---
-title: "Introduction"
-description: "Welcome to your project"
+title: "PA-PVP Mini: Adversarial Review Protocol for AI Outputs"
+sidebarTitle: "Home"
+description: "PA-PVP Mini stress-tests your ideas, plans, prompts, and AI-generated answers by turning any AI chat into a structured adversarial reviewer."
 ---
 
-Write a short description of your product here. What it does, who it's for, and what they can accomplish with it.
+PA-PVP Mini is a structured review protocol that you activate inside any AI chat session. It instructs the AI to act as an adversarial reviewer — finding gaps, weak logic, missing constraints, and shaky fixes in whatever you submit. No praise, no style polish: just concrete problems with structural fixes.
 
-<Tip>
-  Ready to make this your own? Start by editing this page. Update your `docs.json` file to customize your site. Then fill out the [Quickstart](/quickstart) page.
-</Tip>
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Get your first adversarial review in under two minutes.
+  </Card>
+  <Card title="When to Use It" icon="compass" href="/when-to-use">
+    See which artifacts benefit most from adversarial review.
+  </Card>
+  <Card title="Two-AI Ping-Pong" icon="arrows-rotate" href="/guides/two-ai-mode">
+    Run alternating review passes across two independent AI chats.
+  </Card>
+  <Card title="Protocol Reference" icon="book" href="/reference/input-blocks">
+    Explore all input blocks, output fields, and review rules.
+  </Card>
+</CardGroup>
 
-<Card title="Quickstart" icon="rocket" href="/quickstart">
-  This card links to the quickstart page in your project.
-</Card>
-<Card title="Components" icon="puzzle-piece" href="https://mintlify.com/docs/components">
-  Add cards, callouts, steps, tabs, and more to design and structure your pages.
-</Card>
-<Card title="Settings" icon="gear" href="https://mintlify.com/docs/organize/settings">
-  Set your site name, branding, and navigation in the `docs.json` file.
-</Card>
+## How it works
+
+PA-PVP Mini gives any AI chat a strict behavioral contract. You paste the protocol text into a session, then submit your artifact. The AI returns a structured list of findings — each one anchored to your material, assigned a severity, and paired with a concrete fix.
+
+<Steps>
+  <Step title="Download the protocol">
+    Grab `pa_pvp mini v2.3.txt` from the [GitHub repository](https://github.com/XxYouDeaDPunKxX/PA-PVP-mini). This is the single file that powers everything.
+  </Step>
+  <Step title="Activate in your AI chat">
+    Paste the protocol text into a new chat session (or upload the file if the platform supports attachments). The AI is now operating under the adversarial review contract.
+  </Step>
+  <Step title="Submit your artifact">
+    Send the content you want reviewed. Label it clearly for best results:
+    ```text
+    ORIGINAL_ARTIFACT:
+    [your material here]
+    ```
+  </Step>
+  <Step title="Receive structured findings">
+    The AI returns Round 1 — a list of findings with severity levels, evidence anchored to your artifact, and a concrete fix for each problem.
+  </Step>
+  <Step title="Continue with a second AI (optional)">
+    Copy the output and paste it into a second AI chat running the same protocol. The second AI reviews both your artifact and the first review independently — the ping-pong begins.
+  </Step>
+</Steps>
+
+## What makes it different
+
+<CardGroup cols={3}>
+  <Card title="No praise, no fluff" icon="ban">
+    The protocol explicitly prohibits narrative commentary and encouragement. Every output item must be observable, specific, and actionable.
+  </Card>
+  <Card title="Every finding has a fix" icon="wrench">
+    A finding with no valid structural fix is excluded. You never receive a problem without a path to resolving it.
+  </Card>
+  <Card title="Provenance tracking" icon="timeline">
+    Finding IDs, fix IDs, and `derived_from` links trace each issue across multiple review rounds.
+  </Card>
+</CardGroup>
+
+<Note>
+PA-PVP Mini does not prove that something is correct. It is a review aid, not an authority. The quality of findings depends on the AI model reading the protocol. Read the [Limits and Caveats](/resources/limits-and-caveats) page before relying on it for high-stakes decisions.
+</Note>

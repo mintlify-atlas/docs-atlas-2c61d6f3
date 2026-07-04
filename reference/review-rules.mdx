@@ -1,0 +1,64 @@
+---
+title: "PA-PVP Mini Review Rules and Finding Criteria"
+sidebarTitle: "Review Rules"
+description: "The complete set of rules governing what counts as a valid finding, how many findings are allowed, and what the section concentration rule means."
+---
+
+The protocol enforces strict rules on what counts as a valid finding and what can be reported. These rules exist to keep the output structurally useful and prevent inflation, padding, and noise. A finding that does not meet all criteria below is silently dropped — it is not included, noted, or flagged as excluded.
+
+## Finding Validity Criteria
+
+Every finding must satisfy all five of the following criteria. Failing any one disqualifies the finding.
+
+**Observable** — The problem must be directly visible in `ORIGINAL_ARTIFACT`. If it requires inference, assumption, or reading between the lines, it does not qualify. The reviewer must be able to point to the specific content that exhibits the problem.
+
+**Specific** — The finding must identify a particular element, rule, section, field, or behavior. Vague statements about general quality, completeness, or tone are not findings.
+
+**Actionable** — There must be something concrete that can be changed. A finding that describes a problem with no possible structural response is not a finding.
+
+**Structurally relevant** — The problem must affect structure, behavior, constraints, decision rules, flow, validation, or operational clarity. Surface issues that do not touch any of these dimensions are excluded.
+
+**Anchored to ORIGINAL_ARTIFACT** — Every finding and every evidence line must cite content from `ORIGINAL_ARTIFACT` specifically. Evidence drawn from `PREVIOUS_ROUND_OUTPUT`, `MEMORY_NOTE`, chat context, or reviewer assumptions is invalid.
+
+## Fix Validity
+
+A fix is valid only if it changes at least one of the following: structure, behavior, constraints, decision rules, flow, validation, or operational clarity.
+
+Pure wording fixes are invalid **unless** the rewording removes an ambiguity that has a structural or behavioral consequence. If two readers could interpret a phrase differently and each interpretation would produce different execution behavior, fixing that phrase is a valid structural fix. If the two readings produce the same behavior, the fix is cosmetic and is excluded.
+
+A finding with no valid fix is not a finding. The protocol does not include it.
+
+## Finding Count Rules
+
+- The reviewer identifies **up to 5** structural findings per round.
+- There is **no floor** — if fewer than 5 genuine findings exist, fewer are reported. The output is not padded.
+- If more than 5 findings exist, the reviewer keeps the strongest and cuts the weakest. The cut is not disclosed.
+- Do not interpret a short finding list as incomplete. Fewer findings is a valid outcome.
+
+## Section Concentration Rule
+
+By default, no more than **2 findings** may reference the same section of `ORIGINAL_ARTIFACT`. This prevents the reviewer from exhausting the finding budget on a single area while ignoring the rest of the artifact.
+
+**Exception:** if one section contains concentrated structural failure — meaning multiple independent structural problems that each meet all validity criteria — the reviewer may report **up to 4 findings** for that section. When this exception is invoked, the output must include the marker `SECTION OVERLOAD JUSTIFIED` on that section's findings.
+
+## Mechanics vs. Heuristics
+
+When a rule in `ORIGINAL_ARTIFACT` requires human judgment to apply — rather than a deterministic check — the reviewer must name that dependence as a structural weakness. Heuristic rules are weaker than mechanical rules because their results vary by interpreter. If the artifact relies on judgment calls without defining the criteria for those calls, that gap is a reportable structural finding.
+
+## No Praise Rule
+
+The reviewer produces no praise, encouragement, narrative commentary, or positive framing. Output contains findings and fixes only. A statement that something works well is not included — absence of a finding for a section is sufficient signal that no structural problem was identified there.
+
+## FAQs
+
+<Accordion title="What if I disagree with a finding?">
+  Supply the updated artifact as a new `ORIGINAL_ARTIFACT` in the next round alongside the prior output in `PREVIOUS_ROUND_OUTPUT`. The reviewer will re-examine the artifact independently, then check whether the prior finding still holds. If the problem was addressed, the finding will be marked `CONFIRMED` as fixed or will simply not reappear. If the reviewer still observes the problem, it will reappear with a `CONFIRMED` label and updated evidence. You can also use `CURRENT_ROUND` to force a fresh Round 1 on the revised content.
+</Accordion>
+
+<Accordion title="Can the reviewer produce zero findings?">
+  Yes. There is no minimum finding count. If `ORIGINAL_ARTIFACT` contains no observable, specific, actionable, structurally relevant problems that meet all validity criteria, the output contains zero findings. An empty findings list is a valid result, not a failure of the review.
+</Accordion>
+
+<Accordion title="What does 'anchored to ORIGINAL_ARTIFACT' mean?">
+  It means every claim in a finding — both the problem statement and the evidence — must be traceable to specific content inside the `ORIGINAL_ARTIFACT` block. The reviewer cannot cite chat history, general knowledge about the topic, assumptions about intent, or content from `PREVIOUS_ROUND_OUTPUT` or `MEMORY_NOTE` as evidence for a finding. If the evidence for a finding does not exist in `ORIGINAL_ARTIFACT`, the finding is dropped.
+</Accordion>

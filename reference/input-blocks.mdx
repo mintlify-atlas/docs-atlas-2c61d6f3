@@ -1,0 +1,53 @@
+---
+title: "PA-PVP Mini Input Blocks Reference"
+sidebarTitle: "Input Blocks"
+description: "Complete reference for all PA-PVP Mini input blocks: ORIGINAL_ARTIFACT, PREVIOUS_ROUND_OUTPUT, MEMORY_NOTE, and CURRENT_ROUND."
+---
+
+PA-PVP Mini recognizes exactly four named input blocks. The protocol reads only what you explicitly place inside these blocks — it does not use chat history, accumulated session memory, or any context that exists outside them. Everything you want the reviewer to consider must be included in one of the four blocks below.
+
+## Input Blocks
+
+<ParamField body="ORIGINAL_ARTIFACT" type="string" required>
+  The primary source of truth for the review. This is the artifact being reviewed — a plan, prompt, piece of code, AI-generated output, or any other structured content. Every finding the reviewer produces must be anchored directly to content in this block. The reviewer cannot cite evidence from any other source.
+
+  ```text
+  ORIGINAL_ARTIFACT:
+  [your content here]
+  ```
+</ParamField>
+
+<ParamField body="PREVIOUS_ROUND_OUTPUT" type="string">
+  The full output from a prior review round. This block is optional in Round 1 but required to trigger Round 2+ behavior. Its contents are treated as **audit material** — the reviewer checks prior findings for validity, challenges weak or overstated ones, and identifies misses. It is not a source of authority about the artifact itself; only `ORIGINAL_ARTIFACT` holds that role.
+
+  ```text
+  PREVIOUS_ROUND_OUTPUT:
+  [paste prior round output here]
+  ```
+</ParamField>
+
+<ParamField body="MEMORY_NOTE" type="string">
+  A short carry-over block for context you want to persist between sessions — for example, a note about which fixes were already applied or which concerns were de-prioritized. Like `PREVIOUS_ROUND_OUTPUT`, this block is treated as audit material, not source authority. It influences round detection when no explicit `CURRENT_ROUND` is provided.
+
+  ```text
+  MEMORY_NOTE:
+  [short carry-over context here]
+  ```
+</ParamField>
+
+<ParamField body="CURRENT_ROUND" type="number">
+  An explicit round number that overrides automatic round detection. When this block is present, the protocol uses the value you specify and performs no inference from other blocks. Use this when you want to reset the count, force a specific round, or prevent ambiguity.
+
+  ```text
+  CURRENT_ROUND:
+  2
+  ```
+</ParamField>
+
+<Warning>
+  Anything outside these four blocks is ignored. The protocol does not use accumulated chat context, prior messages in the session, or assumptions the AI may have formed from earlier exchanges. If information is not inside one of the four blocks, it does not exist from the reviewer's perspective.
+</Warning>
+
+<Note>
+  Whether `PREVIOUS_ROUND_OUTPUT` or `MEMORY_NOTE` is present determines how the protocol detects the current round when `CURRENT_ROUND` is not explicitly set. See [Round Detection](/reference/round-detection) for the full logic.
+</Note>

@@ -1,0 +1,96 @@
+---
+title: "Two-AI Ping-Pong Review with PA-PVP Mini"
+sidebarTitle: "Two-AI Mode"
+description: "Run alternating adversarial review passes across two independent AI chats — each one challenges both the artifact and the previous review."
+---
+
+Two-AI mode turns PA-PVP Mini into a ping-pong between two completely separate AI chat sessions. AI-A reviews your artifact and returns Round 1 findings. You then open AI-B, activate the same protocol, and give it both the original artifact and AI-A's full output. AI-B independently reviews the artifact first, then audits AI-A's findings — confirming what held up, challenging what didn't, and surfacing anything that was missed. You can continue alternating between the two sessions for as many rounds as useful.
+
+## What each AI does
+
+Every AI in the chain does two things in strict order:
+
+1. **Independent review** — reviews the `ORIGINAL_ARTIFACT` without looking at the prior output first
+2. **Prior-round audit** — cross-checks the previous AI's findings against its own independent review
+
+This separation is what makes the ping-pong valuable. Because each AI completes its own review before examining the prior one, agreements are genuine confirmations rather than echo-chamber repetition.
+
+## Setup flow
+
+<Steps>
+  <Step title="Activate PA-PVP Mini in AI-A">
+    Open a new chat session with your first AI. Paste the full contents of `pa_pvp mini v2.3.txt` to activate the protocol.
+  </Step>
+
+  <Step title="Submit your artifact and receive Round 1">
+    Send your material labeled as `ORIGINAL_ARTIFACT`:
+
+    ```text
+    ORIGINAL_ARTIFACT:
+    [your material]
+    ```
+
+    AI-A returns Round 1. All findings are labeled `INDEPENDENT`. Copy the entire output — you will need it in the next step.
+  </Step>
+
+  <Step title="Open AI-B and activate PA-PVP Mini in a new chat">
+    Open a completely separate chat session with your second AI (or a new session with the same AI provider). Paste `pa_pvp mini v2.3.txt` again to activate a fresh protocol instance with no shared memory.
+  </Step>
+
+  <Step title="Submit the artifact plus AI-A's Round 1 output to AI-B">
+    In the AI-B chat, send both blocks together:
+
+    ```text
+    ORIGINAL_ARTIFACT:
+    [your material]
+
+    PREVIOUS_ROUND_OUTPUT:
+    [AI-A Round 1 output]
+    ```
+
+    AI-B first produces its own independent review of the artifact, then audits AI-A's findings, labeling each as `CONFIRMED`, `CHALLENGED`, or `NEW`.
+  </Step>
+
+  <Step title="Review the Round 2 output from AI-B">
+    AI-B's output includes a `MERGE STATUS` block that summarises the state of all findings across both rounds. Use it as a triage guide before deciding what to act on (see [Applying Fixes](/guides/applying-fixes) for details).
+  </Step>
+
+  <Step title="Continue by copying AI-B's output back to AI-A">
+    To run Round 3, go back to the AI-A chat (or open a fresh session with AI-A), and send the original artifact together with AI-B's complete Round 2 output as `PREVIOUS_ROUND_OUTPUT`. AI-A now audits AI-B's findings. Continue alternating for as many rounds as needed.
+  </Step>
+</Steps>
+
+## No shared memory required
+
+Each round is fully self-contained. The full text of `PREVIOUS_ROUND_OUTPUT` carries all the context the next AI needs — finding IDs, evidence, fixes, severity labels, and provenance. Neither AI needs access to the other's chat history. You can even run the two sessions days apart.
+
+## MERGE STATUS fields
+
+Round 2+ outputs include a `MERGE STATUS` block at the end of the findings. The fields are:
+
+<CardGroup cols={2}>
+  <Card title="confirmed_fixes_ready ✅" icon="circle-check">
+    Fixes from the prior round that survived the current independent review. These have been validated by two separate passes.
+  </Card>
+  <Card title="challenged_items 🥊" icon="circle-xmark">
+    Prior findings or fixes that the current AI disputes — because they are invalid, overstated, duplicated, weak, or not anchored to the artifact.
+  </Card>
+  <Card title="new_fixes 🆕" icon="circle-plus">
+    Fixes for problems found in the current round that were not present in any prior round. These are fresh and have not yet been cross-checked.
+  </Card>
+  <Card title="conflicts ⚠️" icon="triangle-exclamation">
+    Direct contradictions between the current independent review and the prior audit position. Conflicts are declared explicitly rather than silently resolved — they require human judgment.
+  </Card>
+</CardGroup>
+
+<Tip>
+  Use two different AI providers — for example ChatGPT and Claude — rather than two sessions with the same provider. Different training, different tendencies, and different knowledge weighting produce genuinely divergent findings. Agreements between them carry more weight; contradictions surface assumptions worth examining.
+</Tip>
+
+<Warning>
+  Always include the full `ORIGINAL_ARTIFACT` in every pass — not just the previous round's output. `PREVIOUS_ROUND_OUTPUT` is audit material, not source authority. An AI given only the prior review has no artifact to anchor its findings to and cannot produce valid evidence.
+</Warning>
+
+<Note>
+  For details on how PA-PVP Mini auto-detects the current round number from the blocks you supply, see [Round Detection](/reference/round-detection).
+</Note>
